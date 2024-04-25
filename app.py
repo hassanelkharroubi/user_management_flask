@@ -1,13 +1,16 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-from .models import db
-from .routes import get_users, get_user, create_user, update_user, delete_user
+from models import db
+from routers import get_users, get_user, create_user, update_user, delete_user
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+
+with app.app_context():
+    db.init_app(app)
+    db.create_all()
 
 @app.route('/users', methods=['GET'])
 def users():
@@ -32,5 +35,4 @@ def delete(email):
     return delete_user(email)
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
